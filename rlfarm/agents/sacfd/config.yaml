@@ -1,0 +1,73 @@
+agent:
+  class: sacfd
+
+  actor:
+    class: soft-gaussian
+    encoder:
+      class: id
+      kwargs:
+    network:
+      class: dense
+      kwargs:
+        input_dim: null
+        output_dim: null
+        hidden_nodes: [64,64]
+        fc_norm: null
+        fc_act: relu
+        fc_drop_rate: 0.0
+        out_norm: null
+        out_act: null
+        out_drop_rate: 0.0
+    optimizer:
+      class: adam
+      kwargs:
+        betas: [0.9,0.999]
+        lr: 0.005
+        weight_decay: 0.0001
+
+  critic:
+    class: continuous-double # [continuous-double-shared-encoder, continuous-double]
+    encoder:
+      class: id
+      kwargs:
+    network:
+      class: dense
+      kwargs:
+        input_dim: null
+        output_dim: null
+        hidden_nodes: [64,64]
+        fc_norm: null
+        fc_act: relu
+        fc_drop_rate: 0.0
+        out_norm: null
+        out_act: null
+        out_drop_rate: 0.0
+    optimizer:
+      class: adam
+      kwargs:
+        betas: [0.9,0.999]
+        lr: 0.005
+        weight_decay: 0.0001
+
+  kwargs:
+    critic_tau: 0.005
+    critic_grad_clip: 20.0
+    actor_grad_clip: 20.0
+    gamma: 0.95
+    alpha: 0.2
+    alpha_auto_tune: true
+    alpha_lr: 0.0001
+    target_entropy: -2.
+    target_update_freq: 2
+    actor_update_freq: 1
+    shared_encoder: false
+    action_prior: uniform # [normal, uniform]
+    normalize_priorities: true
+    replay_alpha: 0.3
+    replay_beta: 1.0
+    init_weightsdir: null # null for nothing
+    lambda_bc: 0
+    lambda_nstep: 1.0
+    q_filter: false
+    replay_demo_bonus: 0
+    replay_lambda_actor: 0

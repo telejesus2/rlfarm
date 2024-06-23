@@ -1,0 +1,35 @@
+environment:
+  class: rlbench
+  task: 
+    class: reach_target
+    kwargs: # differ for each task
+      reward: sparse # ['sparse', 'dist', 'delta-dist']
+      reward_scale: 1000
+      variations: [0,2,4,6,8] # [] for all
+  action:
+    class: move-arm-then-gripper # ['move-arm-then-gripper', 'primitives']
+    kwargs:
+      arm_action: 4
+      gripper_action: 1
+  observation:
+    image_size: [128, 128]
+    joint_positions: true
+    joint_velocities: true
+    gripper_pose: true
+    gripper_open: true
+    front_rgb: true
+    wrist_rgb: true
+    low_dim: false
+  kwargs:
+    dataset_root: /home/caor/Documents/datasets/rlbench_data/baxter/128
+    robot_config: ur3baxter 
+    variations: [0,2,4,6,8]
+    swap_variation_every: 1
+    headless: true
+    stack_vision_channels: true
+    max_episode_steps: 100
+    reward_scale: 100
+    reset_to_demo_ratio: 0
+    state_includes_remaining_time: false
+    state_includes_previous_action: false
+    state_includes_variation_index: false

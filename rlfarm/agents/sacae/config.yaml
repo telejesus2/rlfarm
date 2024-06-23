@@ -1,0 +1,148 @@
+agent:
+  class: sacae
+
+  actor:
+    class: soft-gaussian
+    encoder:
+      class: cnn
+      kwargs:
+        input_dim: null
+        output_dim: 50
+        filters: [5,10]
+        kernels: [3,3]
+        strides: [2,2]
+        paddings: [2,2]
+        dilations: [1,1]
+        conv_norm: null
+        conv_act: relu
+        conv_drop_rate: 0.0
+        out_norm: null
+        out_act: tanh
+        out_drop_rate: 0.0
+    network:
+      class: dense
+      kwargs:
+        input_dim: null
+        output_dim: null
+        hidden_nodes: [64,64]
+        fc_norm: null
+        fc_act: relu
+        fc_drop_rate: 0.0
+        out_norm: null
+        out_act: null
+        out_drop_rate: 0.0
+    optimizer:
+      class: adam
+      kwargs:
+        betas: [0.9,0.999]
+        lr: 0.005
+        weight_decay: 0.0001
+
+  critic:
+    class: continuous-double-shared-encoder # [continuous-double-shared-encoder, continuous-double]
+    encoder:
+      class: cnn
+      kwargs:
+        input_dim: null
+        output_dim: 50
+        filters: [5,10]
+        kernels: [3,3]
+        strides: [2,2]
+        paddings: [2,2]
+        dilations: [1,1]
+        conv_norm: null
+        conv_act: relu
+        conv_drop_rate: 0.0
+        out_norm: null
+        out_act: tanh
+        out_drop_rate: 0.0
+    network:
+      class: dense
+      kwargs:
+        input_dim: null
+        output_dim: null
+        hidden_nodes: [64,64]
+        fc_norm: null
+        fc_act: relu
+        fc_drop_rate: 0.0
+        out_norm: null
+        out_act: null
+        out_drop_rate: 0.0
+    optimizer:
+      class: adam
+      kwargs:
+        betas: [0.9,0.999]
+        lr: 0.005
+        weight_decay: 0.0001
+
+  decoder:
+    class: dcnn
+    kwargs:
+      input_dim: null
+      output_dim: null
+      filters: [10,5]
+      kernels: [3,3]
+      strides: [2,2]
+      paddings: [2,2]
+      dilations: [1,1]
+      conv_norm: null
+      conv_act: relu
+      conv_drop_rate: 0.0
+      in_norm: null
+      in_act: tanh
+      in_drop_rate: 0.0
+    optimizer:
+      class: adam
+      kwargs:
+        betas: [0.9,0.999]
+        lr: 0.005
+        weight_decay: 0.0001
+
+  encoder:
+    optimizer:
+      class: adam
+      kwargs:
+        betas: [0.9,0.999]
+        lr: 0.005
+        weight_decay: 0.0001
+
+  curl:
+    optimizer:
+      class: adam
+      kwargs:
+        betas: [0.9,0.999]
+        lr: 0.005
+        weight_decay: 0.0001
+
+  kwargs:
+    critic_tau: 0.005
+    critic_grad_clip: 20.0
+    actor_grad_clip: 20.0
+    gamma: 0.95
+    alpha: 0.2
+    alpha_auto_tune: true
+    alpha_lr: 0.0001
+    target_entropy: -2.
+    target_update_freq: 2
+    actor_update_freq: 1
+    shared_encoder: true
+    action_prior: uniform
+    normalize_priorities: true
+    replay_alpha: 0.3
+    replay_beta: 1.0
+    lambda_bc: 0
+    lambda_nstep: 1.0
+    q_filter: false
+    replay_demo_bonus: 0
+    replay_lambda_actor: 0
+    encoder_tau: 0.005
+    use_rec: true
+    encoder_grad_clip: 20.0
+    decoder_grad_clip: 20.0
+    decoder_latent_lambda: 0.000001
+    rec_update_freq: 1
+    replay_lambda_rec: 1.0
+    rec_loss: mse
+    use_cpc: true
+    cpc_grad_clip: 20.0
+    cpc_update_freq: 1

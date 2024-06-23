@@ -1,0 +1,22 @@
+trainer:
+  class: sync # [sync, async, ray]
+  kwargs:
+    iterations: 400000
+    replay_ratio: 32
+    transitions_before_train: 1000
+    iterations_before_sample: 3000
+    save_freq: 100
+
+trainer:
+  class: async # [sync, async, ray]
+  num_train_envs: 1
+  num_train_envs_gpu: 1
+  num_eval_envs: 0
+  load_weights_freq: 1
+  episodes: null # null for infinity
+  kwargs:
+    iterations: 190000
+    replay_ratio_min_max: [32, 64]
+    transitions_before_train: 200
+    iterations_before_sample: 0
+    save_freq: 100

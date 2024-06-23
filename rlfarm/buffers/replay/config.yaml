@@ -1,0 +1,22 @@
+# each callback should be named episode_callback_x where x is an integer
+
+episode_callback_1: 
+  class: reward_relabeling
+  kwargs:
+    strategy: replace # [add, replace]
+    include_final: false
+    bonus: 5
+    steps: demo # [all, demo, x>=0]
+    steps_demo: demo # [all, demo, x>=0]
+    schedule: true
+
+episode_callback_2: 
+  class: state_encoding
+  default_network: agent.actor.encoder # TODO not sure this should be here
+  kwargs:
+    batch_size: 32
+
+episode_callback_3:
+  class: goal_relabeling
+  kwargs:
+    discard_original_trajectory: true 

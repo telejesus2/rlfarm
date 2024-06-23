@@ -1,0 +1,205 @@
+agent:
+  class: sacv1-sail
+
+  actor:
+    class: soft-gaussian
+    encoder:
+      class: id
+      kwargs:
+    network:
+      class: dense
+      kwargs:
+        input_dim: null
+        output_dim: null
+        hidden_nodes: [64,64]
+        fc_norm: null
+        fc_act: relu
+        fc_drop_rate: 0.0
+        out_norm: null
+        out_act: null
+        out_drop_rate: 0.0
+    optimizer:
+      class: adam
+      kwargs:
+        betas: [0.9,0.999]
+        lr: 0.005
+        weight_decay: 0.0001
+
+  q-function:
+    class: continuous-double # [continuous-double-shared-encoder, continuous-double]
+    encoder:
+      class: id
+      kwargs:
+    network:
+      class: dense
+      kwargs:
+        input_dim: null
+        output_dim: null
+        hidden_nodes: [64,64]
+        fc_norm: null
+        fc_act: relu
+        fc_drop_rate: 0.0
+        out_norm: null
+        out_act: null
+        out_drop_rate: 0.0
+    optimizer:
+      class: adam
+      kwargs:
+        betas: [0.9,0.999]
+        lr: 0.005
+        weight_decay: 0.0001
+
+  v-function:
+    encoder:
+      class: id
+      kwargs:
+    network:
+      class: dense
+      kwargs:
+        input_dim: null
+        output_dim: null
+        hidden_nodes: [64,64]
+        fc_norm: null
+        fc_act: relu
+        fc_drop_rate: 0.0
+        out_norm: null
+        out_act: null
+        out_drop_rate: 0.0
+    optimizer:
+      class: adam
+      kwargs:
+        betas: [0.9,0.999]
+        lr: 0.005
+        weight_decay: 0.0001
+
+  kwargs:
+    critic_tau: 0.005
+    critic_grad_clip: 20.0
+    actor_grad_clip: 20.0
+    gamma: 0.95
+    alpha: 0.2
+    alpha_auto_tune: true
+    alpha_lr: 0.0001
+    target_entropy: -2.
+    target_update_freq: 2
+    actor_update_freq: 1
+    shared_encoder: false
+    action_prior: uniform # [normal, uniform]
+    normalize_priorities: true
+    replay_alpha: 0.3
+    replay_beta: 1.0
+    lambda_bc: 2.0
+    lambda_nstep: 1.0
+    q_filter: false
+    replay_demo_bonus: 0
+    replay_lambda_actor: 0
+    init_weightsdir: null # null for nothing
+    use_v: false
+    lambda_sail: 0.9
+    clip_sail: 1 # 0 for not clipping
+
+
+buffer:
+  class: replay
+
+  episode_callback_1: 
+    class: reward_relabeling
+    kwargs:
+      strategy: replace
+      include_final: false
+      bonus: 17.1
+      steps: 5 # [all, demo, x>=0]
+      steps_demo: 5 # [all, demo, x>=0]
+      schedule_steps: false
+      schedule_bonus: true
+
+  main_buffer:
+    use_demos: true
+    prioritized: true
+    use_disk: false
+    demos:
+      num_init_per_variation: 200
+      num_ratio: 0.1
+      augmentation: false
+      augmentation_every_n: 10
+    kwargs:
+      n_steps: [1, 5, 21]
+      history_len: 1
+      batch_size: 64
+      replay_capacity: 100000
+      max_sample_attempts: 10000
+
+  demo_buffer:
+    batch_size_ratio: 0 # 0 to not use a demo buffer
+    prioritized: true
+    use_disk: false
+    demos:
+      num_init_per_variation: 700
+    kwargs:
+      replay_capacity: 160000
+      max_sample_attempts: 10000
+
+
+environment:
+  class: rlbench
+  task: 
+    class: slide_block_to_target
+    kwargs:
+      reward: sparse # ['sparse', 'dist', 'delta-dist']
+      reward_scale: 500
+  action:
+    class: move-arm-then-gripper
+    kwargs:
+      arm_action: 4
+      gripper_action: 1
+  observation:
+    image_size: [128, 128]
+    joint_positions: true
+    joint_velocities: true
+    gripper_pose: true
+    gripper_open: true
+    front_rgb: false
+    front_point_cloud: false
+    wrist_rgb: false
+    low_dim: true
+  kwargs:
+    dataset_root: ./datasets/rlbench/
+    robot_config: ur3baxter-smallworkspace 
+    variations: [0]
+    swap_variation_every: 0
+    headless: true
+    stack_vision_channels: true
+    channels_first: false
+    max_episode_steps: 100
+    reward_scale: 100
+    reset_to_demo_ratio: 0
+    state_includes_remaining_time: false
+    state_includes_previous_action: false
+    state_includes_variation_index: false
+
+
+trainer:
+  class: async
+  num_train_envs: 3
+  num_train_envs_gpu: 1
+  num_eval_envs: 0
+  load_weights_freq: 1
+  episodes: null # null for infinity
+  kwargs:
+    iterations: 300000
+    replay_ratio_min_max: [32, 64]
+    transitions_before_train: 1000
+    iterations_before_sample: 3000
+    save_freq: 100
+
+
+general:
+  exp_name: stir2-slide
+  action_repeat: 1
+  gpu_trainer: 0 # gpu index, null for cpu
+  gpu_sampler: null # gpu index, null for cpu
+  logdir: ./logs/
+  log_freq: 100
+  tensorboard_logging: true
+  csv_logging: true
+  seeds: 3
